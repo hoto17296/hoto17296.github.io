@@ -1,3 +1,10 @@
+/*!
+ * ripple.js
+ *
+ * Copyright (c) 2014 Yuki Ishikawa (@hoto17296).
+ * http://hoto.me/
+ */
+
 (function($){
   var self;
   var canvas;
