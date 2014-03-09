@@ -11,7 +11,7 @@ body {
   background-color: #9DD16D;
 }
 
-a:link, a:visited { color: brown; }
+a:link, a:visited { color: #fff; }
 a:hover, a:active { color: orange; }
 
 .background {
