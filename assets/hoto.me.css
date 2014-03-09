@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'やさしさゴシック';
-  src: url('font/yasashisa_sub.woff');
+  src: url('yasashisa_sub.woff');
 }
 
 body {
@@ -27,6 +27,11 @@ a:hover, a:active { color: orange; }
 
 h2 {
   margin-top: 2em;
+}
+
+ul {
+  padding-left: 1em;
+  line-height: 1.5em;
 }
 
 #sns {
