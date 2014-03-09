@@ -11,7 +11,7 @@
   var settings = {
     class       : 'background',
     refreshRate : 50,
-    rainfall    : 75, // 0-100
+    rainfall    : 90,  // 0-100
     pace        : 100,
     ripple: {
       min       : 10,
@@ -60,9 +60,10 @@
   };
 
   function rainfall(){
+    var r =  settings.ripple.max;
     new Ripple({
-      clientX: Math.floor( Math.random() * canvas.width() ),
-      clientY: Math.floor( Math.random() * canvas.height() )
+      clientX: Math.floor( Math.random() * ( canvas.width() + r * 2 ) - r ),
+      clientY: Math.floor( Math.random() * ( canvas.height() + r ) - r / 2 )
     });
   };
 
@@ -102,19 +103,14 @@
     return this.r < settings.ripple.max;
   };
   
-  CanvasRenderingContext2D.prototype.ellipse = function(arg){
-    var cnt = arg || 0;
-    var x = (cnt.x) ? cnt.x : 0;
-    var y = (cnt.y) ? cnt.y : 0;
-    var width = (cnt.width) ? cnt.width : 0;
-    var height = (cnt.height) ? cnt.height : 0; 
-    var radW = width/2;
-    var radH = height/2;
+  CanvasRenderingContext2D.prototype.ellipse = function(args){
+    var x = args.x, w = args.width / 2;
+    var y = args.y, h = args.height / 2;
     this.beginPath();
-    this.bezierCurveTo(x, y - radH, x + radW , y - radH, x + radW, y);
-    this.bezierCurveTo(x + radW, y, x + radW, y + radH, x, y + radH);
-    this.bezierCurveTo(x, y + radH, x - radW, y + radH, x - radW, y);
-    this.bezierCurveTo(x - radW, y, x - radW, y - radH, x, y - radH);
+    this.bezierCurveTo(x,   y-h, x+w, y-h, x+w, y);
+    this.bezierCurveTo(x+w, y,   x+w, y+h, x,   y+h);
+    this.bezierCurveTo(x,   y+h, x-w, y+h, x-w, y);
+    this.bezierCurveTo(x-w, y,   x-w, y-h, x,   y-h);
   };
 
 })(jQuery);
