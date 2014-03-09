@@ -26,10 +26,21 @@ $(function(){
     }
   }
 
+  var interval = $(document).width() * $(document).height();
+  setInterval(function(){
+    var e = {
+      clientX: Math.floor( Math.random() * $(document).width() ),
+      clientY: Math.floor( Math.random() * $(document).height() )
+    };
+    new Ripple(c, e);
+  //}, 100000000/interval);
+  }, 100);
+
   var timer = false;
   $(window).resize(function(){
     if (timer !== false) { clearTimeout(timer); }
     timer = setTimeout(function() { c = initCanvas() }, 200);
+    interval = $(document).width() * $(document).height();
   });
 });
 
