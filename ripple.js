@@ -52,7 +52,7 @@
   };
 
   function refresh(){
-    canvas.clearCanvas();
+    canvas[0].getContext('2d').clearRect(0, 0, canvas.width(), canvas.height());
     ripples = $.grep(ripples, function(e){ return e; });
     $.each(ripples, function(i, ripple){
       if (!ripple.draw()) { ripples[i] = undefined; }
@@ -90,14 +90,31 @@
 
   Ripple.prototype.draw = function(){
     var alpha = 1 - this.r / settings.ripple.max;
-    canvas.drawEllipse({
-      strokeStyle: 'rgba(255,255,255,' + alpha + ')',
-      strokeWidth: settings.ripple.thickness,
+    var ctx = canvas[0].getContext('2d');
+    ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')';
+    ctx.lineWidth = settings.ripple.thickness;
+    ctx.ellipse({
       x: this.x, width: this.r * 2,
       y: this.y, height: this.r
     });
+    ctx.stroke();
     this.r += settings.ripple.velocity;
     return this.r < settings.ripple.max;
+  };
+  
+  CanvasRenderingContext2D.prototype.ellipse = function(arg){
+    var cnt = arg || 0;
+    var x = (cnt.x) ? cnt.x : 0;
+    var y = (cnt.y) ? cnt.y : 0;
+    var width = (cnt.width) ? cnt.width : 0;
+    var height = (cnt.height) ? cnt.height : 0; 
+    var radW = width/2;
+    var radH = height/2;
+    this.beginPath();
+    this.bezierCurveTo(x, y - radH, x + radW , y - radH, x + radW, y);
+    this.bezierCurveTo(x + radW, y, x + radW, y + radH, x, y + radH);
+    this.bezierCurveTo(x, y + radH, x - radW, y + radH, x - radW, y);
+    this.bezierCurveTo(x - radW, y, x - radW, y - radH, x, y - radH);
   };
 
 })(jQuery);
