@@ -28,3 +28,44 @@ a:hover, a:active { color: orange; }
 h2 {
   margin-top: 2em;
 }
+
+#sns {
+  font-size: medium;
+  vertical-align: bottom;
+  display: inline-block;
+}
+
+#sns a {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-image: url(social.png);
+}
+
+#sns a span {
+  display: none;
+}
+
+#sns .twitter {
+  background-position: left top;
+}
+#sns a.twitter:hover,
+#sns a.twitter:active {
+  background-position: left bottom;
+}
+
+#sns .facebook {
+  background-position: center top;
+}
+#sns a.facebook:hover,
+#sns a.facebook:active {
+  background-position: center bottom;
+}
+
+#sns .github {
+  background-position: right top;
+}
+#sns a.github:hover,
+#sns a.github:active {
+  background-position: right bottom;
+}
