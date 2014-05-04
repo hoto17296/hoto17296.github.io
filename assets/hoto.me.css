@@ -20,9 +20,17 @@ a:hover, a:active { color: orange; }
   z-index: -1;
 }
 
-#main {
+.container {
   max-width: 32em;
   margin: 0 auto;
+}
+
+.flex-box {
+  display: flex;
+}
+
+.flex-item {
+  width: 50%;
 }
 
 h2 {
