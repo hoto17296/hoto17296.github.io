@@ -9,10 +9,8 @@ body {
   font-family: 'やさしさゴシック';
   color: #fff;
   background-color: #9DD16D;
+  padding: 4em 0;
 }
-
-a:link, a:visited { color: #fff; }
-a:hover, a:active { color: orange; }
 
 .background {
   position: fixed;
@@ -21,8 +19,11 @@ a:hover, a:active { color: orange; }
 }
 
 .container {
-  max-width: 32em;
+  max-width: 36em;
   margin: 0 auto;
+}
+
+#header {
 }
 
 .flex-box {
@@ -33,8 +34,43 @@ a:hover, a:active { color: orange; }
   width: 50%;
 }
 
+h1 {
+  font-size: 3em;
+  margin-bottom: .5em;
+}
+
 h2 {
-  margin-top: 2em;
+  margin: 3em 0 1.5em;
+}
+
+h2 span {
+  padding-bottom: .2em;
+  border-bottom: .2em #fff solid;
+}
+
+.box-link {
+  font-size: larger;
+  color: #fff;
+  background-color: #9DD16D;
+  text-decoration: none;
+  padding: .5em .7em;
+  border: .2em #fff solid;
+  border-radius: .5em;
+  transition-property: background-color, color;
+  transition-duration: 200ms;
+}
+
+.box-link:hover,
+.box-link:active {
+  color: #9DD16D;
+  background-color: #fff;
+}
+
+.box-link:after {
+  content: '▶';
+  margin-left: 1em;
+  vertical-align: middle;
+  font-size: .5em;
 }
 
 ul {
