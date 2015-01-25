@@ -118,3 +118,9 @@ ul {
 #sns a.github:active {
   background-position: right bottom;
 }
+
+@media screen and (max-width: 768px){
+  .flex-box {
+    display: block;
+  }
+}
