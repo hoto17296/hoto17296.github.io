@@ -77,7 +77,6 @@ h2 span {
 .box-link {
   font-size: larger;
   color: #fff;
-  background-color: #9DD16D;
   text-decoration: none;
   padding: .5em .7em;
   border: .2em #fff solid;
@@ -112,6 +111,8 @@ ul {
 #sns a {
   color: white;
   text-decoration: none;
+  transition-property: color, text-shadow;
+  transition-duration: 200ms;
 }
 
 #sns a:hover,
