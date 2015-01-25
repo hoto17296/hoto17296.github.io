@@ -34,7 +34,8 @@ body {
   font-family: 'やさしさゴシック';
   color: #fff;
   background-color: #9DD16D;
-  padding: 4em 0;
+  margin: 0;
+  padding: 4em 1em;
 }
 
 .background {
