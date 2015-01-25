@@ -2,7 +2,32 @@
 
 @font-face {
   font-family: 'やさしさゴシック';
-  src: url('yasashisa_sub.woff');
+  src: url('fonts/yasashisa_sub.woff');
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:url('fonts/icomoon.eot?du66iu');
+  src:url('fonts/icomoon.eot?#iefixdu66iu')   format('embedded-opentype'),
+      url('fonts/icomoon.woff?du66iu')        format('woff'),
+      url('fonts/icomoon.ttf?du66iu')         format('truetype'),
+      url('fonts/icomoon.svg?du66iu#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon {
+  font-family: 'icomoon';
+  speak: none;
+  font-weight: normal;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -79,44 +104,46 @@ ul {
 }
 
 #sns {
-  font-size: medium;
-  vertical-align: bottom;
   display: inline-block;
+  font-size: 2em;
 }
 
 #sns a {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background-image: url(social.png);
+  color: white;
+  text-decoration: none;
+}
+
+#sns a:hover,
+#sns a:active {
+  text-shadow: 0 0 .3em white;
 }
 
 #sns a span {
   display: none;
 }
 
-#sns .twitter {
-  background-position: left top;
+#sns .twitter:before {
+  content: "\ea91";
 }
 #sns a.twitter:hover,
 #sns a.twitter:active {
-  background-position: left bottom;
+  color: #55acee;
 }
 
-#sns .facebook {
-  background-position: center top;
+#sns .facebook:before {
+  content: "\ea8d";
 }
 #sns a.facebook:hover,
 #sns a.facebook:active {
-  background-position: center bottom;
+  color: #3b5999;
 }
 
-#sns .github {
-  background-position: right top;
+#sns .github:before {
+  content: "\eab1";
 }
 #sns a.github:hover,
 #sns a.github:active {
-  background-position: right bottom;
+  color: black;
 }
 
 @media screen and (max-width: 768px){
