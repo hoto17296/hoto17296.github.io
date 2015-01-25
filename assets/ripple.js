@@ -1,17 +1,17 @@
 /*!
- * ripple.js
+ * ripple.js v1.1
  *
- * Copyright (c) 2014 Yuki Ishikawa (@hoto17296).
+ * Copyright 2014 Yuki Ishikawa (@hoto17296)
+ * Released under the MIT license
  * http://hoto.me/
  */
 
 (function($){
   var self;
-  var canvas;
+  var $canvas;
   var settings = {
-    class       : 'background',
     refreshRate : 50,
-    rainfall    : 90,  // 0-100
+    rainfall    : 50,
     pace        : 100,
     ripple: {
       min       : 10,
@@ -20,39 +20,44 @@
       velocity  : 10
     }
   };
+  var $d = $(document);
   var pos = { x: 0, y: 0 };
-  var timer = false;
- 
+  var rainfallInterval;
+  var resizeInterval;
+
   $.fn.ripple = function(options){
     self = this;
     settings = $.extend(settings, options);
-    canvas = initCanvas(self);
+
+    init();
+
     setInterval(refresh, settings.refreshRate);
 
     $(window).resize(resize);
-
-    setInterval(rainfall, 1000 - settings.rainfall * 10);
-
-    $(document).click(function(e){ new Ripple(e) });
-    $(document).mousemove(step);
-    $(document).bind('touchstart', function(e){
+    $d.click(function(e){ new Ripple(e) });
+    $d.mousemove(step);
+    $d.bind('touchstart', function(e){
       new Ripple(e.originalEvent.touches[0]);
     });
-    $(document).bind('touchmove', function(e){
+    $d.bind('touchmove', function(e){
       step(e.originalEvent.touches[0]);
     });
   };
 
-  function initCanvas(){
-    $('.' + settings.class, self).remove();
-    return $('<canvas/>').attr({
-      width:  $(document).width(),
-      height: $(document).height()
-    }).addClass(settings.class).prependTo(self);
+  function init(){
+    if ($canvas) { $canvas.remove(); }
+    $canvas = $('<canvas/>')
+      .attr({ width: $d.width(), height: $d.height() })
+      .css({ position: 'fixed', top: 0, left: 0, 'z-index': -1 })
+      .prependTo(self);
+
+    if (rainfallInterval) { clearInterval(rainfallInterval) }
+    var frequency = $canvas.width() * $canvas.height() * settings.rainfall;
+    rainfallInterval = setInterval(rainfall, 0xffffffff / frequency);
   };
 
   function refresh(){
-    canvas[0].getContext('2d').clearRect(0, 0, canvas.width(), canvas.height());
+    $canvas[0].getContext('2d').clearRect(0, 0, $canvas.width(), $canvas.height());
     ripples = $.grep(ripples, function(e){ return e; });
     $.each(ripples, function(i, ripple){
       if (!ripple.draw()) { ripples[i] = undefined; }
@@ -60,10 +65,10 @@
   };
 
   function rainfall(){
-    var r =  settings.ripple.max;
+    var r = settings.ripple.max;
     new Ripple({
-      clientX: Math.floor( Math.random() * ( canvas.width() + r * 2 ) - r ),
-      clientY: Math.floor( Math.random() * ( canvas.height() + r ) - r / 2 )
+      clientX: Math.floor( Math.random() * ( $canvas.width() + r * 2 ) - r ),
+      clientY: Math.floor( Math.random() * ( $canvas.height() + r ) - r / 2 )
     });
   };
 
@@ -76,12 +81,12 @@
   };
 
   function resize(){
-    if (timer !== false) { clearTimeout(timer) }
-    timer = setTimeout(function() { canvas = initCanvas(self) }, 200);
+    if (resizeInterval) { clearTimeout(resizeInterval) }
+    resizeInterval = setTimeout(init, 200);
   };
 
   var ripples = [];
-  
+
   var Ripple = function(e){
     this.x = e.clientX;
     this.y = e.clientY;
@@ -91,7 +96,7 @@
 
   Ripple.prototype.draw = function(){
     var alpha = 1 - this.r / settings.ripple.max;
-    var ctx = canvas[0].getContext('2d');
+    var ctx = $canvas[0].getContext('2d');
     ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')';
     ctx.lineWidth = settings.ripple.thickness;
     ctx.ellipse({
@@ -102,7 +107,7 @@
     this.r += settings.ripple.velocity;
     return this.r < settings.ripple.max;
   };
-  
+
   CanvasRenderingContext2D.prototype.ellipse = function(args){
     var x = args.x, w = args.width / 2;
     var y = args.y, h = args.height / 2;
