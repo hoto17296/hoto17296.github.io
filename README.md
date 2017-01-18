@@ -51,8 +51,7 @@
 # 社外活動など
 
 ## JavaScript コミュニティ Gotanda.js 主宰
-- http://gotanda.js.org/
-- 250人を超すコミュニティ
+- [http://gotanda.js.org/](http://gotanda.js.org/)
 - 3ヶ月に1回イベントを開催している
 
 ## ChatBot 開発
