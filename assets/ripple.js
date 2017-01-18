@@ -1,121 +1,145 @@
-/*!
- * ripple.js v1.1
+/**
+ * ripple.js v2.0.0
  *
- * Copyright 2014 Yuki Ishikawa (@hoto17296)
+ * Copyright 2017 Yuki Ishikawa (@hoto17296)
  * Released under the MIT license
- * http://hoto.me/
  */
 
-(function($){
-  var self;
-  var $canvas;
-  var settings = {
-    refreshRate : 50,
-    rainfall    : 50,
-    pace        : 100,
-    ripple: {
-      min       : 10,
-      max       : 200,
-      thickness : 4,
-      velocity  : 10
+class Ripple {
+  constructor(elem, opts, w) {
+    this.elem = elem;
+    this.opts = Object.assign({
+      rainfallAmount: 0.8, // 0 - 1
+      strideLength: 100,   // px
+      resizeDelay: 200,    // msec
+    }, opts);
+    this.w = w || window;
+    this.d = this.w.document;
+    this.drops = [];
+
+    this.init();
+
+    // ウィンドウサイズが変わったら初期化
+    this.w.addEventListener('resize', () => {
+      if ( this.resizeInterval ) this.w.clearTimeout( this.resizeInterval );
+      this.resizeInterval = this.w.setTimeout(this.init.bind(this), this.opts.resizeDelay);
+    });
+
+    // クリック/タップしたら波紋を追加
+    this.elem.addEventListener('click', (event) => {
+      const pos = new Position( event.clientX, event.clientY );
+      this.addDrop(pos);
+    });
+    this.elem.addEventListener('touchstart', (event) => {
+      const pos = new Position( event.clientX, event.clientY );
+      this.addDrop(pos);
+    });
+
+    // カーソル/指を動かしたら波紋を追加
+    this.elem.addEventListener('mousemove', (event) => {
+      const pos = new Position( event.clientX, event.clientY );
+      this.stride(pos);
+    });
+    this.elem.addEventListener('touchmove', (event) => {
+      const pos = new Position( event.touches[0].clientX, event.touches[0].clientY );
+      this.stride(pos);
+    });
+  }
+
+  init() {
+    if ( this.canvas ) this.canvas.remove();
+    this.canvas = this.d.createElement('canvas');
+    this.canvas.setAttribute('width', this.elem.clientWidth);
+    this.canvas.setAttribute('height', this.elem.clientHeight);
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.top = 0;
+    this.canvas.style.bottom = 0;
+    this.canvas.style.zIndex = 0;
+    this.elem.appendChild( this.canvas );
+
+    if ( this.animationRequestId ) this.w.cancelAnimationFrame( this.animationRequestId );
+    this.render();
+  }
+
+  render() {
+    this.canvas.getContext('2d').clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+    this.drops = this.drops.filter((drop) => drop.draw());
+    this.rainfall();
+    this.animationRequestId = this.w.requestAnimationFrame( this.render.bind(this) );
+  }
+
+  addDrop(pos) {
+    this.drops.push( new Drop(this.canvas, pos, this.opts.drop) );
+  }
+
+  stride(pos) {
+    if ( ! this.recentStridePos ) this.recentStridePos = new Position();
+    if ( this.opts.strideLength < this.recentStridePos.diff(pos) ) {
+      this.recentStridePos = pos;
+      this.addDrop(pos);
     }
-  };
-  var $d = $(document);
-  var pos = { x: 0, y: 0 };
-  var rainfallInterval;
-  var resizeInterval;
+  }
 
-  $.fn.ripple = function(options){
-    self = this;
-    settings = $.extend(settings, options);
+  rainfall() {
+    const area = this.canvas.clientWidth * this.canvas.clientHeight;
+    const freq = Math.pow(10, this.opts.rainfallAmount * 2 - 8);
+    if ( Math.random() > area * freq ) return;
+    const r = ( this.opts.drop ? this.opts.drop.max : 0 ) || 0;
+    const pos = new Position(
+      Math.floor( Math.random() * ( this.canvas.clientWidth + r * 2 ) - r ),
+      Math.floor( Math.random() * ( this.canvas.clientHeight + r ) - r / 2 )
+    );
+    this.addDrop(pos);
+  }
+}
 
-    init();
+class Position {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
 
-    setInterval(refresh, settings.refreshRate);
+  diff(pos) {
+    const diffPow = {
+      x: Math.pow(this.x - pos.x, 2),
+      y: Math.pow(this.y - pos.y, 2),
+    };
+    return Math.sqrt( diffPow.x + diffPow.y );
+  }
+}
 
-    $(window).resize(resize);
-    $d.click(function(e){ new Ripple(e) });
-    $d.mousemove(step);
-    $d.bind('touchstart', function(e){
-      new Ripple(e.originalEvent.touches[0]);
-    });
-    $d.bind('touchmove', function(e){
-      step(e.originalEvent.touches[0]);
-    });
-  };
+class Drop {
+  constructor(canvas, pos, opts) {
+    this.opts = Object.assign({
+      min: 10,       // px
+      max: 200,      // px
+      thickness: 4,  // px
+      velocity: 0.5, // 0 - 1
+      color: { r: 255, g: 255, b: 255 },
+    }, opts);
+    this.canvas = canvas;
+    this.pos = pos;
+    this.r = this.opts.min;
+  }
 
-  function init(){
-    if ($canvas) { $canvas.remove(); }
-    $canvas = $('<canvas/>')
-      .attr({ width: $d.width(), height: $d.height() })
-      .css({ position: 'fixed', top: 0, left: 0, 'z-index': -1 })
-      .prependTo(self);
-
-    if (rainfallInterval) { clearInterval(rainfallInterval) }
-    var frequency = $canvas.width() * $canvas.height() * settings.rainfall;
-    rainfallInterval = setInterval(rainfall, 0xffffffff / frequency);
-  };
-
-  function refresh(){
-    $canvas[0].getContext('2d').clearRect(0, 0, $canvas.width(), $canvas.height());
-    ripples = $.grep(ripples, function(e){ return e; });
-    $.each(ripples, function(i, ripple){
-      if (!ripple.draw()) { ripples[i] = undefined; }
-    });
-  };
-
-  function rainfall(){
-    var r = settings.ripple.max;
-    new Ripple({
-      clientX: Math.floor( Math.random() * ( $canvas.width() + r * 2 ) - r ),
-      clientY: Math.floor( Math.random() * ( $canvas.height() + r ) - r / 2 )
-    });
-  };
-
-  function step(e){
-    var diff = Math.pow(pos.x-e.clientX,2) + Math.pow(pos.y-e.clientY,2);
-    if (Math.pow(settings.pace,2) < diff) {
-      pos = { x: e.clientX, y: e.clientY };
-      new Ripple(e);
-    }
-  };
-
-  function resize(){
-    if (resizeInterval) { clearTimeout(resizeInterval) }
-    resizeInterval = setTimeout(init, 200);
-  };
-
-  var ripples = [];
-
-  var Ripple = function(e){
-    this.x = e.clientX;
-    this.y = e.clientY;
-    this.r = settings.ripple.min;
-    ripples.push(this);
-  };
-
-  Ripple.prototype.draw = function(){
-    var alpha = 1 - this.r / settings.ripple.max;
-    var ctx = $canvas[0].getContext('2d');
-    ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')';
-    ctx.lineWidth = settings.ripple.thickness;
-    ctx.ellipse({
-      x: this.x, width: this.r * 2,
-      y: this.y, height: this.r
-    });
+  draw() {
+    const alpha = 1 - this.r / this.opts.max;
+    const ctx = this.canvas.getContext('2d');
+    ctx.strokeStyle = 'rgba(' + [ this.opts.color.r, this.opts.color.g, this.opts.color.b, alpha ].join(',') + ')';
+    ctx.lineWidth = this.opts.thickness;
+    ctx.ellipse({ pos: this.pos, width: this.r * 2, height: this.r });
     ctx.stroke();
-    this.r += settings.ripple.velocity;
-    return this.r < settings.ripple.max;
-  };
+    this.r += this.opts.velocity * 10;
+    return this.r < this.opts.max;
+  }
+}
 
-  CanvasRenderingContext2D.prototype.ellipse = function(args){
-    var x = args.x, w = args.width / 2;
-    var y = args.y, h = args.height / 2;
-    this.beginPath();
-    this.bezierCurveTo(x,   y-h, x+w, y-h, x+w, y);
-    this.bezierCurveTo(x+w, y,   x+w, y+h, x,   y+h);
-    this.bezierCurveTo(x,   y+h, x-w, y+h, x-w, y);
-    this.bezierCurveTo(x-w, y,   x-w, y-h, x,   y-h);
-  };
-
-})(jQuery);
+CanvasRenderingContext2D.prototype.ellipse = function(args) {
+  const x = args.pos.x, w = args.width / 2;
+  const y = args.pos.y, h = args.height / 2;
+  this.beginPath();
+  this.bezierCurveTo(x,   y-h, x+w, y-h, x+w, y  );
+  this.bezierCurveTo(x+w, y,   x+w, y+h, x,   y+h);
+  this.bezierCurveTo(x,   y+h, x-w, y+h, x-w, y  );
+  this.bezierCurveTo(x-w, y,   x-w, y-h, x,   y-h);
+};
