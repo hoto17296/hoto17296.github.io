@@ -1,6 +1,7 @@
 # 基本情報
 - Name: 石川 雄基 (Yuki Ishikawa)
 - Blog: [blog.hotolab.net](http://blog.hotolab.net)
+- StrengthsFinder: 親密性 / 学習欲 / 信念 / 分析思考 / 規律性
 
 # SNS アカウント
 - [Facebook](https://facebook.com/hoto17296)
