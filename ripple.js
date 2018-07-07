@@ -1,7 +1,7 @@
 /**
- * ripple.js v2.0.0
+ * ripple.js v2.0.1
  *
- * Copyright 2017 Yuki Ishikawa (@hoto17296)
+ * Copyright 2018 Yuki Ishikawa (@hoto17296)
  * Released under the MIT license
  */
 
@@ -54,7 +54,7 @@ class Ripple {
     this.canvas.style.position = 'absolute';
     this.canvas.style.top = 0;
     this.canvas.style.bottom = 0;
-    this.canvas.style.zIndex = 0;
+    this.canvas.style.zIndex = -1;
     this.elem.appendChild( this.canvas );
 
     if ( this.animationRequestId ) this.w.cancelAnimationFrame( this.animationRequestId );
